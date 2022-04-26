@@ -1,25 +1,12 @@
-import datetime as dt
-from datetime import datetime
-import alpaca_trade_api as tradeapi
 import json
 import urllib.request as request
+from datetime import datetime
 from urllib.parse import urlencode
+
+import alpaca_trade_api as tradeapi
+
+import config as c
 from table_structure.market import Market
-
-import pytz
-
-# authentication and connection details for paper account
-api_key = 'PKARUEFU8ZDET5S1XJJZ'
-api_secret = 'k9LtDIakVJl2FH7jMVtaD7Y68E7g8tmxkGIkVspw'
-base_url = 'https://paper-api.alpaca.markets'
-
-# authentication and connection details for live account
-# api_key = 'AK9W46VSQW67H67630G4'
-# api_secret = 'dDmEmSE0zA54riAEoEOcDE86vywCNJu8aECqb30U'
-# base_url = 'https://api.alpaca.markets'
-
-app_key = '65475'
-sign = '707fdd063e617f06fbe8bc3b8b88a155'
 
 
 def realtime_subscribe_stocks(stock_list):
@@ -30,16 +17,15 @@ def realtime_subscribe_stocks(stock_list):
     """
     global a_list
     stock_codes = ",".join(stock_list)
-    url = 'http://api.k780.com'
     params = {
         'app': 'finance.stock_realtime',
         'stoSym': stock_codes,
-        'appkey': app_key,
-        'sign': sign,
+        'appkey': c.app_key,
+        'sign': c.sign,
         'format': 'json',
     }
     params = urlencode(params)
-    f = request.urlopen('%s?%s' % (url, params))
+    f = request.urlopen('%s?%s' % (c.url, params))
     nowapi_call = f.read()
     # print content
     result = json.loads(nowapi_call)
@@ -70,16 +56,19 @@ def realtime_subscribe_stocks(stock_list):
 
 
 def subscribe_stocks_list():
-    url = 'http://api.k780.com'
+    """
+    订阅股票信息
+    :return:
+    """
     params = {
         'app': 'finance.stock_list',
         'category': 'us',
-        'appkey': app_key,
-        'sign': sign,
+        'appkey': c.app_key,
+        'sign': c.sign,
         'format': 'json',
     }
     params = urlencode(params)
-    f = request.urlopen('%s?%s' % (url, params))
+    f = request.urlopen('%s?%s' % (c.url, params))
     nowapi_call = f.read()
     data_list = []
     # print content
@@ -102,8 +91,10 @@ def trade_api():
     交易接口
     :return:
     """
-    api = tradeapi.REST(api_key, api_secret, base_url, api_version='v2')
+    api = tradeapi.REST(c.api_key, c.api_secret, c.base_url, api_version='v2')
     return api
+
+
 #
 #
 # def reformat_date(date):
@@ -140,4 +131,4 @@ def trade_api():
 #     return newDate
 
 if __name__ == '__main__':
-    subscribe_stocks_list()
+    print(c.passwd)

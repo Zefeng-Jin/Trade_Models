@@ -27,5 +27,3 @@ def atr(df, n):
     df['ATR'] = df['TR'].ewm(span=n, adjust=False, min_periods=n).mean()
     df2 = df.drop(['H-L', 'H-PC', 'L-PC'], axis=1)
     return df2
-
-

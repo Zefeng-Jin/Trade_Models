@@ -1,5 +1,4 @@
 class Market:
-    # # 允许绑定的对象，只有2个属性 __name 和 __age
     __slots__ = ('__stock_code', '__company', '__open_price', '__last_price',
                  '__high_price', '__low_price', '__volume', '__occur_time')
 
@@ -75,9 +74,3 @@ class Market:
                 self.__open_price, self.__last_price,
                 self.__high_price, self.__low_price,
                 self.__volume, self.__occur_time)
-
-
-if __name__ == '__main__':
-    map = {"age": 5, "name": "leo", "xxxx": 88}
-    print(Market(**map))
-#     print(p.age)
