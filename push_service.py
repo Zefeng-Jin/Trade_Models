@@ -1,15 +1,17 @@
 import pymysql
 from dbutils.pooled_db import PooledDB
+
+import config as c
 import subscribe_service as ss
 
 
 class push_service:
 
     def __init__(self):
-        self.host = 'sh-cynosdbmysql-grp-o8wcogew.sql.tencentcdb.com'
-        self.user = 'root'
-        self.passwd = 'Sj13722449888'
-        self.port = 25897
+        self.host = c.host
+        self.user = c.user
+        self.passwd = c.passwd
+        self.port = c.port
         self.pool = self.connect()
 
     def connect(self):
@@ -24,7 +26,7 @@ class push_service:
                         user=self.user,
                         passwd=self.passwd,
                         port=self.port,
-                        db='trade',
+                        db=c.database,
                         use_unicode=True)
         return pool
 

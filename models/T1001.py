@@ -1,9 +1,10 @@
 import copy
-import indicators_handler as handler
-import time
-import subscribe_service as untils
 import datetime as dt
+import time
+
+import indicators_handler as handler
 import push_service as db
+import subscribe_service as untils
 
 
 # noinspection DuplicatedCode
@@ -194,4 +195,3 @@ class MovingAverage:
             for j in range(len(self.df.iloc[i])):
                 market.append(self.df.iloc[i, j])
             db.dbConn().insert_market(market)
-

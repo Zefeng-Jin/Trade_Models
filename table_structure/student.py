@@ -1,5 +1,4 @@
 class Student:
-
     # 允许绑定的对象，只有2个属性 __name 和 __age
     __slots__ = ('__name', '__age')
 
