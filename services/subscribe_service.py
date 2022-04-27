@@ -1,12 +1,10 @@
-import datetime as dt
-from datetime import datetime
-import alpaca_trade_api as tradeapi
 import json
 import urllib.request as request
 from datetime import datetime
 from urllib.parse import urlencode
 
 import alpaca_trade_api as tradeapi
+import pytz
 
 import config as c
 from table_structure.market import Market

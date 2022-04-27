@@ -3,8 +3,7 @@ import datetime as dt
 import time
 
 import indicators_handler as handler
-import push_service as db
-import subscribe_service as untils
+from services import push_service as db, subscribe_service as untils
 
 
 # noinspection DuplicatedCode

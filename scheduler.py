@@ -3,11 +3,10 @@ import time
 
 import schedule
 
-import push_service as ps
-import subscribe_service as ss
+from services import push_service as ps, subscribe_service as ss
 
 
-def task():
+def market_task():
     stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
     today = datetime.datetime.today().strftime("%Y-%m-%d")
     start_time = "21:00:00"
@@ -26,7 +25,7 @@ def task():
             print("error!!!")
 
 
-schedule.every(1).minutes.do(task)
+schedule.every(1).minutes.do(market_task)
 
 while True:
     # now = datetime.datetime.now()
