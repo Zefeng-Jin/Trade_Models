@@ -17,12 +17,12 @@ def market_task():
     end_date_time = datetime.datetime.strptime(end_date_time_str, '%Y-%m-%d %H:%M:%S')
     now = datetime.datetime.now()
     if now >= start_date_time or now <= end_date_time:
-        try:
-            market_data = ss.realtime_subscribe_stocks(stock_list)
-            ps.push_service().insert_market(market_data)
-            print('insert successfully {}'.format(datetime.datetime.now()))
-        except:
-            print("error!!!")
+        # try:
+        market_data = ss.realtime_subscribe_stocks(stock_list)
+        ps.push_service().insert_market(market_data)
+        print('insert successfully {}'.format(datetime.datetime.now()))
+        # except:
+        #     print("error!!!")
 
 
 schedule.every(1).minutes.do(market_task)

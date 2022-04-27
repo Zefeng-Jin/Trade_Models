@@ -31,6 +31,7 @@ def realtime_subscribe_stocks(stock_list):
     # print content
     result = json.loads(nowapi_call)
     data_list = []
+    ny_time = pytz.timezone('America/New_York')
     if result:
         if result['success'] != '0':
             lists = dict(result['result']['lists'])
@@ -42,7 +43,7 @@ def realtime_subscribe_stocks(stock_list):
                     a_list.append(m.stock_code)
                     a_list.append(m.company)
                     a_list.append(datetime.strptime(m.occur_time, '%Y-%m-%d %H:%M:%S')
-                                  .astimezone(ny_time).strptime('%Y-%m-%d %H:%M:%S'))
+                                  .astimezone(ny_time))
                     a_list.append(m.open_price)
                     a_list.append(m.high_price)
                     a_list.append(m.low_price)
@@ -132,7 +133,7 @@ def trade_api():
 #     newDate = ''.join(rNumList)
 #     return newDate
 
-if __name__ == '__main__':
-    ny_time = pytz.timezone('America/New_York')
-    time = datetime.now().astimezone(ny_time)
-    print(time)
+# if __name__ == '__main__':
+#     ny_time = pytz.timezone('America/New_York')
+#     time = datetime.now().astimezone(ny_time)
+#     print(time)
