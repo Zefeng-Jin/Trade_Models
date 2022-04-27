@@ -1,8 +1,7 @@
 import pymysql
 from dbutils.pooled_db import PooledDB
-
 import config as c
-import subscribe_service as ss
+
 
 
 class push_service:
@@ -86,8 +85,3 @@ class push_service:
     #
     # def insert_profit_loss(self):
     #     print(self.host)
-
-
-if __name__ == '__main__':
-    data_data = ss.subscribe_stocks_list()
-    push_service().insert_stocks(data_data)

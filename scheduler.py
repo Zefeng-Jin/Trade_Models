@@ -28,13 +28,6 @@ def market_task():
 schedule.every(1).minutes.do(market_task)
 
 while True:
-    # now = datetime.datetime.now()
-    # if now.strftime("%H:%m") == "17:15":
     schedule.run_pending()
     time.sleep(1)
 
-# # every hour
-# schedule.every().hour.do(task)
-#
-# # every daya at specific time
-# schedule.every().day.at("10:30").do(task)
