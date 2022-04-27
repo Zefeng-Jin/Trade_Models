@@ -9,10 +9,13 @@ def task():
     stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
     today = datetime.datetime.today().strftime("%Y-%m-%d")
     start_time = "21:00:00"
-    date_time_str = "{} {}".format(today, start_time)
-    date_time = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+    end_time = "04:30:00"
+    start_date_time_str = "{} {}".format(today, start_time)
+    start_date_time = datetime.datetime.strptime(start_date_time_str, '%Y-%m-%d %H:%M:%S')
+    end_date_time_str = "{} {}".format(today, end_time)
+    end_date_time = datetime.datetime.strptime(end_date_time_str, '%Y-%m-%d %H:%M:%S')
     now = datetime.datetime.now()
-    if now >= date_time:
+    if now >= start_date_time or now <= end_date_time:
         try:
             market_data = ss.realtime_subscribe_stocks(stock_list)
             ps.push_service().insert_market(market_data)
