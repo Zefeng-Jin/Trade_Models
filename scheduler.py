@@ -1,9 +1,9 @@
 import datetime
-import time
+import threading
 import schedule
 import utils
-from services import push_service as ps, subscribe_service as ss
 from models import MovingAverage as ma
+from services import push_service as ps, subscribe_service as ss
 
 
 def market_task():
@@ -20,16 +20,16 @@ def market_task():
 def model_task1():
     stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
     art_sl = 0.1
-    executor = cf.ThreadPoolExecutor(max_workers=3)
+    ma.MovingAverage(stock_list, art_sl).schedule()
 
 
-    for s in stock_list:
-        ma.MovingAverage(s, art_sl).schedule()
+def run_threaded(job_func):
+    job_thread = threading.Thread(target=job_func)
+    job_thread.start()
 
 
-
-schedule.every(1).minutes.do(market_task)
+schedule.every(1).minutes.do(run_threaded, market_task)
+schedule.every().day.at("09:30").do(run_threaded, model_task1)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)

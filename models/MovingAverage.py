@@ -1,9 +1,9 @@
 import concurrent.futures as cf
 import copy
 import time
-
 import indicators_handler as handler
 import model_constant as mc
+import utils
 from services import push_service as ps, query_service as qs
 from table_structure.trade import Trade
 
@@ -163,7 +163,7 @@ class MovingAverage:
         调度程序
         :return:
         """
-        while True:
+        if utils.time_check():
             try:
                 self.run()
                 time.sleep(60)  # 1 minute interval between each new execution
