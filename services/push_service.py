@@ -3,7 +3,6 @@ from dbutils.pooled_db import PooledDB
 import config as c
 
 
-
 class push_service:
 
     def __init__(self):
@@ -64,7 +63,7 @@ class push_service:
     def insert_stocks(self, stock_data):
         """
         插入Stock表
-        :param market_data:
+        :param stock_data:
         :return:
         """
         db = self.pool.steady_connection()
@@ -82,6 +81,29 @@ class push_service:
         finally:
             cur.close()
             db.close()
+
+    def insert_trade(self, trade):
+        """
+         插入trade表
+        :param trade:
+        :return:
+        """
+        db = self.pool.steady_connection()
+        cur = db.cursor()
+        sql = "INSERT IGNORE INTO trade " \
+              "(STOCK_CODE,OCCUR_TIME,TRADE_SIGNAL,POSITION,MODEL_ID) " \
+              "VALUES (%s,%s,%s,%s,%s) ;".format(trade.stock_code, trade.occur_time, trade.trade_signal,
+                                                 trade.position, trade.model_id)
+        try:
+            cur.execute(sql)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print("SQL执行错误，原因: ", e)
+        finally:
+            cur.close()
+            db.close()
+
     #
     # def insert_profit_loss(self):
     #     print(self.host)

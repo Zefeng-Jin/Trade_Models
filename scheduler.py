@@ -1,28 +1,31 @@
 import datetime
 import time
-
 import schedule
-
+import utils
 from services import push_service as ps, subscribe_service as ss
+from models import MovingAverage as ma
 
 
 def market_task():
     stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
-    today = datetime.datetime.today().strftime("%Y-%m-%d")
-    start_time = "21:00:00"
-    end_time = "04:30:00"
-    start_date_time_str = "{} {}".format(today, start_time)
-    start_date_time = datetime.datetime.strptime(start_date_time_str, '%Y-%m-%d %H:%M:%S')
-    end_date_time_str = "{} {}".format(today, end_time)
-    end_date_time = datetime.datetime.strptime(end_date_time_str, '%Y-%m-%d %H:%M:%S')
-    now = datetime.datetime.now()
-    if now >= start_date_time or now <= end_date_time:
+    if utils.time_check():
         try:
             market_data = ss.realtime_subscribe_stocks(stock_list)
             ps.push_service().insert_market(market_data)
             print('insert successfully {}'.format(datetime.datetime.now()))
         except:
             print("error!!!")
+
+
+def model_task1():
+    stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
+    art_sl = 0.1
+    executor = cf.ThreadPoolExecutor(max_workers=3)
+
+
+    for s in stock_list:
+        ma.MovingAverage(s, art_sl).schedule()
+
 
 
 schedule.every(1).minutes.do(market_task)

@@ -1,3 +1,4 @@
+import pandas as pd
 import pymysql
 from dbutils.pooled_db import PooledDB
 
@@ -87,6 +88,27 @@ class query_service:
             db.close()
         return stock_list
 
+    def get_hist_market(self, stock_code):
+        """
+        获取历史股票行情信息
+        :return:
+        """
+        db = self.pool.steady_connection()
+        cur = db.cursor()
+        sql = "select M.* from " \
+              "(SELECT *  FROM market WHERE stock_code = 'AAPL' order by occur_time desc limit 500) " \
+              "AS M ORDER BY M.occur_time ASC ;".format(stock_code)
+        try:
+            df = pd.read_sql(sql, db)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print("SQL执行错误，原因: ", e)
+        finally:
+            cur.close()
+            db.close()
+        return df
+
 
 if __name__ == '__main__':
-    print(query_service().get_sp500())
+    print(query_service().get_hist_market("AAPL"))
