@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from services import push_service as ps
 
 
-class Spider:
+class Crawler:
 
     def __init__(self):
         """
