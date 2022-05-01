@@ -1,6 +1,10 @@
+import datetime
+
 import pymysql
 from dbutils.pooled_db import PooledDB
+
 import config as c
+from table_structure.trade import Trade
 
 
 class push_service:
@@ -92,8 +96,12 @@ class push_service:
         cur = db.cursor()
         sql = "INSERT IGNORE INTO trade " \
               "(STOCK_CODE,OCCUR_TIME,TRADE_SIGNAL,POSITION,MODEL_ID) " \
-              "VALUES (%s,%s,%s,%s,%s) ;".format(trade.stock_code, trade.occur_time, trade.trade_signal,
-                                                 trade.position, trade.model_id)
+              "VALUES ('{}','{}','{}','{}','{}') " \
+              "AS NEW(STOCK_CODE,OCCUR_TIME,TRADE_SIGNAL,POSITION,MODEL_ID) " \
+              "ON DUPLICATE KEY UPDATE " \
+              "TRADE_SIGNAL = NEW.TRADE_SIGNAL;" \
+            .format(trade.stock_code, trade.occur_time, trade.trade_signal,
+                    trade.position, trade.model_id)
         try:
             cur.execute(sql)
             db.commit()
@@ -104,6 +112,36 @@ class push_service:
             cur.close()
             db.close()
 
+    def insert_news(self, news):
+        """
+        插入news表
+        :param news:
+        :return:
+        """
+        db = self.pool.steady_connection()
+        cur = db.cursor()
+        sql = "INSERT IGNORE INTO news " \
+              "(BUSI_DATE,TITLE,LINK) " \
+              "VALUES (%s,%s,%s) " \
+              "AS NEW(BUSI_DATE,TITLE,LINK)" \
+              "ON DUPLICATE KEY UPDATE " \
+              "LINK = NEW.LINK;"
+        args = news
+        try:
+            cur.executemany(sql, args)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print("SQL执行错误，原因: ", e)
+        finally:
+            cur.close()
+            db.close()
     #
     # def insert_profit_loss(self):
     #     print(self.host)
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    trade = Trade("AAPL", datetime.datetime.now(), "buy", "Long", 1)
+    push_service().insert_trade(trade)
