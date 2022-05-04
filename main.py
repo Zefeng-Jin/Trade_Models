@@ -5,6 +5,7 @@
 
 import datetime
 
+import crawler as c
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -13,11 +14,5 @@ def print_hi(name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    today = datetime.datetime.today().strftime("%Y-%m-%d")
-    start_time = "17:30:00"
-    date_time_str = "{} {}".format(today, start_time)
-    date_time = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
-    now = datetime.datetime.now()
-    if now >= date_time:
-        print("Yes")
+    c.Crawler().get_data()
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -2,18 +2,17 @@ import json
 import urllib.request as request
 from datetime import datetime
 from urllib.parse import urlencode
-
 import alpaca_trade_api as tradeapi
 import pytz
-
 import config as c
 from table_structure.market import Market
+from table_structure.hist_market import HistMarket
 
 
 def realtime_subscribe_stocks(stock_list):
     """
     订阅股票行情数据
-    :param stock_code:
+    :param stock_list:
     :return:
     """
     global a_list
@@ -39,7 +38,8 @@ def realtime_subscribe_stocks(stock_list):
                 if s in lists.keys():
                     a_list = []
                     m = Market(**lists[s])
-                    a_list.append(datetime.strptime(m.occur_time, '%Y-%m-%d %H:%M:%S').strftime("%Y%m%d"))
+                    a_list.append(
+                        datetime.strptime(m.occur_time, '%Y-%m-%d %H:%M:%S').astimezone(ny_time).strftime("%Y%m%d"))
                     a_list.append(m.stock_code)
                     a_list.append(m.company)
                     a_list.append(datetime.strptime(m.occur_time, '%Y-%m-%d %H:%M:%S')
@@ -50,6 +50,49 @@ def realtime_subscribe_stocks(stock_list):
                     a_list.append(m.last_price)
                     a_list.append(m.volume)
                 data_list.append(a_list)
+        else:
+            print(result['msgid'] + ' ' + result['msg'])
+    else:
+        print('Request nowapi fail.')
+
+    return tuple(data_list)
+
+
+def subscribe_stocks(stock_code, date):
+    """
+    订阅股票历史行情数据
+    :param stock_list:
+    :return:
+    """
+    global a_list
+    params = {
+        'app': 'finance.stock_history',
+        'stoSym': stock_code,
+        'htType': 'HT1D',
+        'dateYmd': date,
+        'appkey': c.app_key,
+        'sign': c.sign,
+        'format': 'json',
+    }
+    params = urlencode(params)
+    f = request.urlopen('%s?%s' % (c.url, params))
+    nowapi_call = f.read()
+    result = json.loads(nowapi_call)
+    data_list = []
+    if result:
+        if result['success'] != '0':
+            data = dict(result['result']['dtList'][0])
+            a_list = []
+            m = HistMarket(**data)
+            a_list.append(m.busi_date)
+            a_list.append(stock_code.split("_")[1].upper())
+            a_list.append(m.open_price)
+            a_list.append(m.close_price)
+            a_list.append(m.high_price)
+            a_list.append(m.low_price)
+            a_list.append(m.volume)
+            a_list.append(m.turnover)
+            data_list.append(a_list)
         else:
             print(result['msgid'] + ' ' + result['msg'])
     else:
@@ -80,7 +123,7 @@ def subscribe_stocks_list():
         if a_result['success'] != '0':
             lists = a_result['result']['lists']
             for s in lists:
-                s_list = [s['symbol'], s['sname']]
+                s_list = [s['symbol'].split('_')[1].upper(), s['sname'], s['symbol']]
                 data_list.append(s_list)
         else:
             print(a_result['msgid'] + ' ' + a_result['msg'])
@@ -98,42 +141,6 @@ def trade_api():
     return api
 
 
-#
-#
-# def reformat_date(date):
-#     """
-#     规范业务日期格式
-#     :param date:
-#     :return:
-#     """
-#     numPattern = re.compile(r'\d+')
-#     numList = numPattern.findall(date)
-#     if len(numList) < 3:
-#         getLogger('ss_log').info("日期格式错误！")
-#         return np.NaN
-#     rNumList = []
-#     # 规范年份
-#     if 4 - len(str(numList[0])) != 0:
-#         year = ''.join(['20', str(numList[0])])
-#         rNumList.append(year)
-#     else:
-#         rNumList.append(str(numList[0]))
-#     # 规范月份
-#     if 2 - len(str(numList[1])) != 0:
-#         month = ''.join(['0', str(numList[1])])
-#         rNumList.append(month)
-#     else:
-#         rNumList.append(str(numList[1]))
-#     # 规范日
-#     if 2 - len(str(numList[2])) != 0:
-#         d = ''.join(['0', str(numList[2])])
-#         rNumList.append(d)
-#     else:
-#         rNumList.append(str(numList[2]))
-#     newDate = ''.join(rNumList)
-#     return newDate
-
-# if __name__ == '__main__':
-#     ny_time = pytz.timezone('America/New_York')
-#     time = datetime.now().astimezone(ny_time)
-#     print(time)
+if __name__ == '__main__':
+    stock_list = 'gb_aapl'
+    print(subscribe_stocks(stock_list, '20220429'))

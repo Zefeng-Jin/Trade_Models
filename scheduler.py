@@ -1,8 +1,8 @@
 import datetime
 import threading
 import schedule
-import utils
 import crawler as c
+import utils
 from models import MovingAverage as ma
 from services import push_service as ps, subscribe_service as ss
 
@@ -13,19 +13,32 @@ def market_task():
         try:
             market_data = ss.realtime_subscribe_stocks(stock_list)
             ps.push_service().insert_market(market_data)
-            print('insert successfully {}'.format(datetime.datetime.now()))
+            print('insert real_market_data successfully {}'.format(datetime.datetime.now()))
         except:
             print("error!!!")
+
+
+def hist_market_task():
+    stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
+    yes = datetime.datetime.now() - datetime.timedelta(1)
+    yes_date = yes.strftime("%Y%m%d")
+    for s in stock_list:
+        hist_market = ss.subscribe_stocks(s, yes_date)
+        ps.push_service().insert_hist_market(hist_market)
+    print('insert hist_market_data successfully {}'.format(datetime.datetime.now()))
 
 
 def model_task1():
     stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft']
     art_sl = 0.1
+    print('start MovingAverage model {}'.format(datetime.datetime.now()))
     ma.MovingAverage(stock_list, art_sl).schedule()
 
 
 def crawler_task():
-    c.Crawler().get_data()
+    if utils.time_check():
+        c.Crawler().get_data()
+        print('insert news successfully {}'.format(datetime.datetime.now()))
 
 
 def run_threaded(job_func):
@@ -34,8 +47,9 @@ def run_threaded(job_func):
 
 
 schedule.every(1).minutes.do(run_threaded, market_task)
-schedule.every().day.at("09:30").do(run_threaded, model_task1)
-schedule.every().day.at("10:00").do(run_threaded, crawler_task)
+schedule.every().day.at("09:30").do(run_threaded, hist_market_task)
+schedule.every().day.at("21:30").do(run_threaded, model_task1)
+schedule.every().hours.do(run_threaded, crawler_task)
 
 while True:
     schedule.run_pending()
