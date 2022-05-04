@@ -1,6 +1,8 @@
 import datetime
 import threading
 import schedule
+
+import crawler
 import crawler as c
 import utils
 from models import MovingAverage as ma
@@ -35,10 +37,15 @@ def model_task1():
     ma.MovingAverage(stock_list, art_sl).schedule()
 
 
-def crawler_task():
-    if utils.time_check():
-        c.Crawler().get_data()
-        print('insert news successfully {}'.format(datetime.datetime.now()))
+def crawler_news_task():
+    c.Crawler().get_data()
+    print('insert news successfully {}'.format(datetime.datetime.now()))
+
+
+def crawler_statistics_task():
+    stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft', 'gb_ibm']
+    c.Crawler().get_finances(stock_list)
+    print('insert statistics successfully {}'.format(datetime.datetime.now()))
 
 
 def run_threaded(job_func):
@@ -48,8 +55,9 @@ def run_threaded(job_func):
 
 schedule.every(1).minutes.do(run_threaded, market_task)
 schedule.every().day.at("09:30").do(run_threaded, hist_market_task)
+schedule.every().day.at("11:01").do(run_threaded, crawler_statistics_task)
 schedule.every().day.at("21:30").do(run_threaded, model_task1)
-schedule.every().hours.do(run_threaded, crawler_task)
+schedule.every().hours.do(run_threaded, crawler_news_task)
 
 while True:
     schedule.run_pending()
