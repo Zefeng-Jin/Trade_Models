@@ -53,7 +53,7 @@ def run_threaded(job_func):
 
 schedule.every(1).minutes.do(run_threaded, market_task)
 schedule.every().day.at("09:30").do(run_threaded, hist_market_task)
-schedule.every().day.at("16:10").do(run_threaded, crawler_statistics_task)
+schedule.every().day.at("17:20").do(run_threaded, crawler_statistics_task)
 schedule.every().day.at("21:30").do(run_threaded, model_task1)
 schedule.every().hours.do(run_threaded, crawler_news_task)
 
