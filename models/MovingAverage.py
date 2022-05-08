@@ -163,7 +163,7 @@ class MovingAverage:
         调度程序
         :return:
         """
-        if utils.time_check():
+        while utils.time_check():
             try:
                 self.run()
                 time.sleep(60)  # 1 minute interval between each new execution

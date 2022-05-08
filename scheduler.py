@@ -1,12 +1,10 @@
 import datetime
 import threading
 import schedule
-
-import crawler
 import crawler as c
 import utils
 from models import MovingAverage as ma
-from services import push_service as ps, subscribe_service as ss
+from services import push_service as ps, subscribe_service as ss, query_service as qs
 
 
 def market_task():
@@ -43,7 +41,7 @@ def crawler_news_task():
 
 
 def crawler_statistics_task():
-    stock_list = ['gb_jpm', 'gb_aapl', 'gb_msft', 'gb_ibm']
+    stock_list = [s.api_stock_code for s in qs.query_service().get_dw30()]
     c.Crawler().get_finances(stock_list)
     print('insert statistics successfully {}'.format(datetime.datetime.now()))
 
@@ -55,7 +53,7 @@ def run_threaded(job_func):
 
 schedule.every(1).minutes.do(run_threaded, market_task)
 schedule.every().day.at("09:30").do(run_threaded, hist_market_task)
-schedule.every().day.at("11:01").do(run_threaded, crawler_statistics_task)
+schedule.every().day.at("16:10").do(run_threaded, crawler_statistics_task)
 schedule.every().day.at("21:30").do(run_threaded, model_task1)
 schedule.every().hours.do(run_threaded, crawler_news_task)
 

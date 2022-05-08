@@ -7,6 +7,7 @@ import pytz
 import config as c
 from table_structure.market import Market
 from table_structure.hist_market import HistMarket
+from table_structure.index import Index
 
 
 def realtime_subscribe_stocks(stock_list):
@@ -132,6 +133,44 @@ def subscribe_stocks_list():
     return tuple(data_list)
 
 
+def subscribe_index_list():
+    """
+    订阅指数信息
+    :return:
+    """
+    url = 'http://api.k780.com'
+    params = {
+        'app': 'finance.globalindex_giList',
+        'appkey': c.app_key,
+        'sign': c.sign,
+        'format': 'json',
+    }
+    params = urlencode(params)
+
+    f = request.urlopen('%s?%s' % (url, params))
+    nowapi_call = f.read()
+    # print content
+    a_result = json.loads(nowapi_call)
+    index_list = []
+    if a_result:
+        if a_result['success'] != '0':
+            i_dict = dict(a_result['result']['lists'])
+            for i in i_dict.keys():
+                l_list = []
+                index = Index(**i_dict[i])
+                l_list.append(index.index_id)
+                l_list.append(index.index_type)
+                l_list.append(index.index_name)
+                l_list.append(index.index_no)
+                index_list.append(l_list)
+        else:
+            print(a_result['msgid'] + ' ' + a_result['msg'])
+    else:
+        print('Request nowapi fail.')
+
+    return tuple(index_list)
+
+
 def trade_api():
     """
     交易接口
@@ -139,8 +178,3 @@ def trade_api():
     """
     api = tradeapi.REST(c.api_key, c.api_secret, c.base_url, api_version='v2')
     return api
-
-
-if __name__ == '__main__':
-    stock_list = 'gb_aapl'
-    print(subscribe_stocks(stock_list, '20220429'))

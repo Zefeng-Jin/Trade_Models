@@ -39,7 +39,7 @@ class query_service:
         """
         db = self.pool.steady_connection()
         cur = db.cursor()
-        sql = "SELECT STOCK_CODE, COMPANY, DOW,SP500 FROM stock WHERE Dow = true;"
+        sql = "SELECT STOCK_CODE, COMPANY, DOW,SP500, API_STOCK_CODE FROM stock WHERE Dow = true;"
         stock_list = []
         try:
             cur.execute(sql)
@@ -50,6 +50,7 @@ class query_service:
                 s.company = r[1]
                 s.dow = r[2]
                 s.sp500 = r[3]
+                s.api_stock_code = r[4]
                 stock_list.append(s)
             db.commit()
         except Exception as e:
@@ -111,4 +112,4 @@ class query_service:
 
 
 if __name__ == '__main__':
-    print(query_service().get_hist_market("AAPL"))
+    print(query_service().get_dw30())

@@ -1,5 +1,3 @@
-import datetime
-
 import pymysql
 from dbutils.pooled_db import PooledDB
 import config as c
@@ -165,6 +163,28 @@ class push_service:
             cur.close()
             db.close()
 
+    def insert_index(self, index):
+        """
+        插入index表
+        :param index
+        :return:
+        """
+        db = self.pool.steady_connection()
+        cur = db.cursor()
+        sql = "INSERT IGNORE INTO stock_index " \
+              "(INDEX_ID,INDEX_TYPE,INDEX_NAME,INDEX_NO) " \
+              "VALUES (%s,%s,%s,%s); "
+        args = index
+        try:
+            cur.executemany(sql, args)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print("SQL执行错误，原因: ", e)
+        finally:
+            cur.close()
+            db.close()
+
     def insert_statistics(self, statistics):
         """
         插入stock_statistics表
@@ -231,22 +251,3 @@ class push_service:
             cur.close()
             db.close()
 
-
-# Press the green button in the gutter to run the script.
-# if __name__ == '__main__':
-#     stock_list = ['gb_jpm', 'gb_ibm', 'gb_msft','gb_aapl']
-#     end_date = datetime.datetime.now() - datetime.timedelta(37)
-#     start_date = end_date - datetime.timedelta(30)
-#     for s in stock_list:
-#         for d in range(0, 31):
-#             d_date = start_date + datetime.timedelta(d)
-#             sd = d_date.strftime("%Y%m%d")
-#             data_list = ss.subscribe_stocks(s, sd)
-#             push_service().insert_hist_market(data_list)
-
-
-
-    # for s in stock_list:
-    #     for d in date_list:
-    #         data_list = ss.subscribe_stocks(s, d)
-    #         push_service().insert_hist_market(data_list)
